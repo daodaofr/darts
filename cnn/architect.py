@@ -45,10 +45,12 @@ class Architect(object):
     unrolled_loss = unrolled_model._loss(input_valid, target_valid)
 
     unrolled_loss.backward()
-    dalpha = [v.grad for v in unrolled_model.arch_parameters()]
+    # Equation 6,7
+    dalpha = [v.grad for v in unrolled_model.arch_parameters()]                        #first-order approximation
     vector = [v.grad.data for v in unrolled_model.parameters()]
-    implicit_grads = self._hessian_vector_product(vector, input_train, target_train)
+    implicit_grads = self._hessian_vector_product(vector, input_train, target_train)   # second-order approximation
 
+    #equation 6
     for g, ig in zip(dalpha, implicit_grads):
       g.data.sub_(eta, ig.data)
 
