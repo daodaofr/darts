@@ -38,6 +38,8 @@ class Cell(nn.Module):
 
     self._ops = nn.ModuleList()
     self._bns = nn.ModuleList()
+    #generate a list of op for each hidden state, the i-th hidden state has i+2 inputs 
+    #See fig 1 of Auto-DeepLab
     for i in range(self._steps):
       for j in range(2+i):
         stride = 2 if reduction and j < 2 else 1
@@ -50,6 +52,7 @@ class Cell(nn.Module):
 
     states = [s0, s1]
     offset = 0
+    #calculate hidden states in the cell
     for i in range(self._steps):
       s = sum(self._ops[offset+j](h, weights[offset+j]) for j, h in enumerate(states))
       offset += len(states)
@@ -65,8 +68,8 @@ class Network(nn.Module):
     self._C = C                         #input channel
     self._num_classes = num_classes     #output class
     self._layers = layers               #number of layers  
-    self._criterion = criterion         # loss function
-    self._steps = steps                 #---------
+    self._criterion = criterion         #loss function
+    self._steps = steps                 #number of hidden states in a cell
     self._multiplier = multiplier       #channel multiplier
 
     C_curr = stem_multiplier*C          #first few stem layers
