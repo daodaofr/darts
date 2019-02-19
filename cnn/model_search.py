@@ -62,14 +62,14 @@ class Network(nn.Module):
 
   def __init__(self, C, num_classes, layers, criterion, steps=4, multiplier=4, stem_multiplier=3):
     super(Network, self).__init__()
-    self._C = C
-    self._num_classes = num_classes
-    self._layers = layers
-    self._criterion = criterion
-    self._steps = steps
-    self._multiplier = multiplier
+    self._C = C                         #input channel
+    self._num_classes = num_classes     #output class
+    self._layers = layers               #number of layers  
+    self._criterion = criterion         # loss function
+    self._steps = steps                 #---------
+    self._multiplier = multiplier       #channel multiplier
 
-    C_curr = stem_multiplier*C
+    C_curr = stem_multiplier*C          #first few stem layers
     self.stem = nn.Sequential(
       nn.Conv2d(3, C_curr, 3, padding=1, bias=False),
       nn.BatchNorm2d(C_curr)
@@ -79,7 +79,8 @@ class Network(nn.Module):
     self.cells = nn.ModuleList()
     reduction_prev = False
     for i in range(layers):
-      if i in [layers//3, 2*layers//3]:
+      # cells located at the 1/3 and 2/3 of the total depth of the network are reduction cells
+      if i in [layers//3, 2*layers//3]:       
         C_curr *= 2
         reduction = True
       else:
